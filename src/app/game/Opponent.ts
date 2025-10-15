@@ -26,7 +26,7 @@ export class Opponent extends Character {
 
     shoot(): void {
         if (!this.dead) {
-            const shot = new Shot(this.x + this.width / 2 - 2.5, this.y + this.height, 5, 10, 5, '/assets/shot_enemy.svg');
+            const shot = new Shot(this.x + this.width / 2 - 2.5, this.y + this.height, 5, 10, 10, '/assets/shot_enemy.svg');
             this.game.opponentShots.push(shot);
         }
     }
