@@ -4,8 +4,8 @@ import { Boss } from './Boss';
 import { Shot } from './Shot';
 
 const GAME_SPEED_MS = 50;
-const OPPONENT_BASE_SPEED = 2;
-const OPPONENT_SHOOT_PROBABILITY = 0.03;
+const OPPONENT_BASE_SPEED = 4;
+const OPPONENT_SHOOT_PROBABILITY = 0.05;
 
 export class Game {
     canvas: HTMLCanvasElement;
@@ -136,7 +136,7 @@ export class Game {
     
     public addShot = (): void => {
         if (this.player && !this.player.dead && this.shots.length < 5) {
-            this.shots.push(new Shot(this.player.x + this.player.width / 2 - 2.5, this.player.y, 5, 20, -15, '/assets/shot_player.svg'));
+            this.shots.push(new Shot(this.player.x + this.player.width / 2 - 2.5, this.player.y, 5, 20, -20, '/assets/shot_player.svg'));
         }
     }
 
