@@ -9,7 +9,7 @@ export class Boss extends Opponent {
         this.image.src = '/assets/boss.svg';
         this.myImage = '/assets/boss.svg';
         this.deadImage = '/assets/star.svg';
-        this.health = 2;
+        this.health = 3;
     }
 
     collide(): void {

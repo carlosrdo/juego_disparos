@@ -4,8 +4,8 @@ import { Boss } from './Boss';
 import { Shot } from './Shot';
 
 const GAME_SPEED_MS = 50;
-const OPPONENT_BASE_SPEED = 4;
-const OPPONENT_SHOOT_PROBABILITY = 0.05;
+const OPPONENT_BASE_SPEED = 8;
+const OPPONENT_SHOOT_PROBABILITY = 0.1;
 
 export class Game {
     canvas: HTMLCanvasElement;
@@ -20,6 +20,7 @@ export class Game {
     score: number = 0;
     private _gameOver: boolean = true;
     private _running: boolean = false;
+    private opponentsDefeated: number = 0;
 
     private startScreen: HTMLElement | null;
     private gameOverlay: HTMLElement | null;
@@ -51,6 +52,7 @@ export class Game {
         this._gameOver = false;
         this._running = true;
         this.score = 0;
+        this.opponentsDefeated = 0;
         this.shots = [];
         this.opponentShots = [];
 
@@ -136,7 +138,7 @@ export class Game {
     
     public addShot = (): void => {
         if (this.player && !this.player.dead && this.shots.length < 5) {
-            this.shots.push(new Shot(this.player.x + this.player.width / 2 - 2.5, this.player.y, 5, 20, -20, '/assets/shot_player.svg'));
+            this.shots.push(new Shot(this.player.x + this.player.width / 2 - 2.5, this.player.y, 5, 20, -30, '/assets/shot_player.svg'));
         }
     }
 
@@ -171,10 +173,16 @@ export class Game {
 
     private removeOpponent = (opponent: Opponent | Boss): void => {
         if (!this._running) return;
+
         if (opponent instanceof Boss) {
             this.endGame(true);
         } else {
-            this.opponent = new Boss(this, 10, 30, 60, 58, OPPONENT_BASE_SPEED);
+            this.opponentsDefeated++;
+            if (this.opponentsDefeated >= 2) {
+                this.opponent = new Boss(this, 10, 30, 60, 58, OPPONENT_BASE_SPEED);
+            } else {
+                this.opponent = new Opponent(this, 10, 30, 50, 44, OPPONENT_BASE_SPEED * (this.opponentsDefeated + 1));
+            }
         }
     }
 
