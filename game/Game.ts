@@ -7,6 +7,8 @@ const GAME_SPEED_MS = 50;
 const OPPONENT_BASE_SPEED = 8;
 const OPPONENT_SHOOT_PROBABILITY = 0.1;
 
+export type GameStatus = 'START' | 'RUNNING' | 'GAME_OVER_WIN' | 'GAME_OVER_LOSE';
+
 export interface GameState {
   player: PlayerState | null;
   opponent: OpponentState | BossState | null;
@@ -14,11 +16,7 @@ export interface GameState {
   opponentShots: ShotState[];
   score: number;
   lives: number;
-  gameOver: boolean;
-  running: boolean;
-  showStartScreen: boolean;
-  showGameOverScreen: boolean;
-  didWin: boolean;
+  status: GameStatus;
 }
 
 export type GameStateCallback = (state: GameState) => void;
@@ -31,11 +29,7 @@ export class Game {
   shots: Shot[] = [];
   opponentShots: Shot[] = [];
   score: number = 0;
-  private _gameOver: boolean = true;
-  private _running: boolean = false;
-  private _showStartScreen: boolean = true;
-  private _showGameOverScreen: boolean = false;
-  private _didWin: boolean = false;
+  private status: GameStatus = 'START';
   private opponentsDefeated: number = 0;
   private gameInterval: ReturnType<typeof setInterval> | null = null;
   private onStateChange: GameStateCallback | null = null;
@@ -60,16 +54,13 @@ export class Game {
     }
   }
 
-  public isGameOver = (): boolean => this._gameOver;
-  public isRunning = (): boolean => this._running;
+  public isGameOver = (): boolean => this.status === 'GAME_OVER_WIN' || this.status === 'GAME_OVER_LOSE';
+  public isRunning = (): boolean => this.status === 'RUNNING';
 
   public start = (): void => {
-    if (this._running) return;
+    if (this.status === 'RUNNING') return;
 
-    this._gameOver = false;
-    this._running = true;
-    this._showStartScreen = false;
-    this._showGameOverScreen = false;
+    this.status = 'RUNNING';
     this.score = 0;
     this.opponentsDefeated = 0;
     this.shots = [];
@@ -89,7 +80,7 @@ export class Game {
   };
 
   private update = (): void => {
-    if (!this.player || !this._running) return;
+    if (!this.player || this.status !== 'RUNNING') return;
 
     this.opponent?.update();
     if (this.opponent && Math.random() < OPPONENT_SHOOT_PROBABILITY) {
@@ -109,7 +100,7 @@ export class Game {
   };
 
   public movePlayer = (direction: 'left' | 'right'): void => {
-    if (!this.player || !this._running || this.player.dead) return;
+    if (!this.player || this.status !== 'RUNNING' || this.player.dead) return;
 
     const moveAmount = 10;
     if (
@@ -124,7 +115,7 @@ export class Game {
   };
 
   public movePlayerTo = (x: number): void => {
-    if (!this.player || !this._running || this.player.dead) return;
+    if (!this.player || this.status !== 'RUNNING' || this.player.dead) return;
 
     this.player.x = Math.max(
       0,
@@ -183,7 +174,7 @@ export class Game {
   };
 
   private removeOpponent = (opponent: Opponent | Boss): void => {
-    if (!this._running) return;
+    if (this.status !== 'RUNNING') return;
 
     if (opponent instanceof Boss) {
       this.endGame(true);
@@ -212,16 +203,13 @@ export class Game {
   public endGame = (win: boolean): void => {
     if (this.gameInterval) clearInterval(this.gameInterval);
     this.gameInterval = null;
-    this._gameOver = true;
-    this._running = false;
-    this._showGameOverScreen = true;
-    this._didWin = win;
+    this.status = win ? 'GAME_OVER_WIN' : 'GAME_OVER_LOSE';
     this.notifyStateChange();
   };
 
   public destroy = (): void => {
     if (this.gameInterval) clearInterval(this.gameInterval);
-    this._running = false;
+    this.gameInterval = null;
   };
 
   public getState = (): GameState => {
@@ -232,11 +220,7 @@ export class Game {
       opponentShots: this.opponentShots.map((s) => s.getState()),
       score: this.score,
       lives: this.player?.lives ?? 0,
-      gameOver: this._gameOver,
-      running: this._running,
-      showStartScreen: this._showStartScreen,
-      showGameOverScreen: this._showGameOverScreen,
-      didWin: this._didWin,
+      status: this.status,
     };
   };
 

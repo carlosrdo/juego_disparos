@@ -203,7 +203,7 @@ export default function GameScreen() {
             ))}
 
             {/* Start Screen */}
-            {gameState?.showStartScreen && (
+            {gameState?.status === 'START' && (
               <View style={styles.overlay}>
                 <Text style={styles.overlayTitle}>Welcome!</Text>
                 <Text style={styles.overlayText}>Use Arrow Keys to Move.</Text>
@@ -218,10 +218,10 @@ export default function GameScreen() {
             )}
 
             {/* Game Over Screen */}
-            {gameState?.showGameOverScreen && (
+            {(gameState?.status === 'GAME_OVER_WIN' || gameState?.status === 'GAME_OVER_LOSE') && (
               <View style={styles.overlay}>
                 <Image
-                  source={gameState.didWin ? youWinImage : gameOverImage}
+                  source={gameState.status === 'GAME_OVER_WIN' ? youWinImage : gameOverImage}
                   style={styles.gameOverImage}
                   resizeMode="contain"
                 />

@@ -1,4 +1,4 @@
-export { Game, type GameState, type GameStateCallback } from './Game';
+export { Game, type GameState, type GameStateCallback, type GameStatus } from './Game';
 export { Entity, type EntityState } from './Entity';
 export { Character, type CharacterState } from './Character';
 export { Player, type PlayerState } from './Player';
